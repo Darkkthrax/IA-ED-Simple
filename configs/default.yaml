@@ -9,7 +9,7 @@ data:
   coeff_min: -5
   coeff_max: 5
   exclude_zero_coeff: true
-  max_degree: 3
+  max_degree: 4
   max_token_length: 64
   output_dir: data/processed
   family: separable

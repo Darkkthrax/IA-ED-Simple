@@ -112,6 +112,16 @@ def f_rational_power(var: sp.Symbol, rng: random.Random, cfg: GenConfig) -> sp.E
     return a / var**n
 
 
+def f_poly(var: sp.Symbol, rng: random.Random, cfg: GenConfig) -> sp.Expr:
+    """Two-term polynomial: a*x**n + b*x**m with 1 <= m < n <= max_degree."""
+    n_hi = max(2, cfg.max_degree)
+    n = rng.randint(2, n_hi)
+    m = rng.randint(1, n - 1)
+    a = _rand_coeff(rng, cfg)
+    b = _rand_coeff(rng, cfg)
+    return a * var**n + b * var**m
+
+
 F_TEMPLATES: dict[str, ExprBuilder] = {
     "const": f_const,
     "linear": f_linear,
@@ -121,6 +131,7 @@ F_TEMPLATES: dict[str, ExprBuilder] = {
     "log": f_log,
     "poly_inv": f_poly_inv,
     "rational_power": f_rational_power,
+    "poly": f_poly,
 }
 
 
@@ -165,6 +176,12 @@ def g_rational_power(var: sp.Symbol, rng: random.Random, cfg: GenConfig) -> sp.E
     return a / var**n
 
 
+def g_inv_k(var: sp.Symbol, rng: random.Random, cfg: GenConfig) -> sp.Expr:
+    """Rational inverse: 1/(k*y) with integer k in [2, 5]."""
+    k = rng.randint(2, 5)
+    return 1 / (k * var)
+
+
 G_TEMPLATES: dict[str, ExprBuilder] = {
     "const": g_const,
     "linear": g_linear,
@@ -173,6 +190,7 @@ G_TEMPLATES: dict[str, ExprBuilder] = {
     "exp": g_exp,
     "log": g_log,
     "rational_power": g_rational_power,
+    "inv_k": g_inv_k,
 }
 
 
