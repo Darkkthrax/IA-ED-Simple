@@ -33,7 +33,7 @@ model:
 
 train:
   batch_size: 64
-  epochs: 20
+  epochs: 30
   lr: 0.0003
   weight_decay: 0.01
   warmup_steps: 1000
