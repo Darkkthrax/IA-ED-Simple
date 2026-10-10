@@ -175,3 +175,4 @@ def show_equations(
         else:
             for i, root in enumerate(roots):
                 display(f"{eid} raíz {i}:", sp.Eq(y, root))
+        print("-------------------------------------------------------\n")
