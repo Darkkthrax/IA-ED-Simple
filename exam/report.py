@@ -25,7 +25,6 @@ def _load_answers(use_demo: bool) -> dict[str, Optional[str]]:
     src = ANSWERS_DEMO if use_demo else ANSWERS
     return {eid: src.get(eid) for eid in EXERCISE_IDS}
 
-
 def run(
     use_demo: bool = False,
     model: Any = None,
@@ -38,6 +37,7 @@ def run(
     out.mkdir(parents=True, exist_ok=True)
 
     answers = _load_answers(use_demo)
+    print(answers)
     solve_cache: dict[str, dict[str, Any]] = {}
     curves: dict[str, dict[str, Any]] = {}
     rows: list[dict[str, Any]] = []
