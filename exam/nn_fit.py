@@ -40,7 +40,16 @@ def fit_and_error(
         scale = 1.0
     to_t = lambda a: torch.tensor(a, dtype=torch.float32).reshape(-1, 1)
     Xtr = to_t((xs_train - mid) / half)
-    Ytr = to_t(ys_train / scale)
+    positive = bool(np.all(ys_train > 0))
+    if positive:
+        log_tr = np.log(ys_train)
+        mu = float(log_tr.mean())
+        sd = float(log_tr.std()) or 1.0
+        Ytr = to_t((log_tr - mu) / sd)
+        decode = lambda out: np.exp(out * sd + mu)
+    else:
+        Ytr = to_t(ys_train / scale)
+        decode = lambda out: out * scale
     Xte = to_t((xs_test - mid) / half)
     h = hidden_size
     net = nn.Sequential(
@@ -57,7 +66,7 @@ def fit_and_error(
         loss.backward()
         opt.step()
     with torch.no_grad():
-        pred = net(Xte).numpy().ravel() * scale
+        pred = decode(net(Xte).numpy().ravel())
     mape = 100 * np.mean(np.abs(pred - ys_test) / np.abs(ys_test))
     nrmse = 100 * np.sqrt(np.mean((pred - ys_test) ** 2)) / (ys_test.max() - ys_test.min())
     return float(mape), float(nrmse)
@@ -89,7 +98,16 @@ def fit_and_curves(
         scale = 1.0
     to_t = lambda a: torch.tensor(a, dtype=torch.float32).reshape(-1, 1)
     Xtr = to_t((xs_train - mid) / half)
-    Ytr = to_t(ys_train / scale)
+    positive = bool(np.all(ys_train > 0))
+    if positive:
+        log_tr = np.log(ys_train)
+        mu = float(log_tr.mean())
+        sd = float(log_tr.std()) or 1.0
+        Ytr = to_t((log_tr - mu) / sd)
+        decode = lambda out: np.exp(out * sd + mu)
+    else:
+        Ytr = to_t(ys_train / scale)
+        decode = lambda out: out * scale
     Xte = to_t((xs_test - mid) / half)
     h = hidden_size
     net = nn.Sequential(
@@ -106,11 +124,10 @@ def fit_and_curves(
         loss.backward()
         opt.step()
     with torch.no_grad():
-        pred_test = net(Xte).numpy().ravel() * scale
-        # Dense sorted grid for the curve plot.
+        pred_test = decode(net(Xte).numpy().ravel())
         xs_plot = np.linspace(x_min, x_max, 200)
         Xplot = to_t((xs_plot - mid) / half)
-        pred_plot = net(Xplot).numpy().ravel() * scale
+        pred_plot = decode(net(Xplot).numpy().ravel())
         exact_plot = np.asarray(f(xs_plot), dtype=float)
 
     mape = 100 * np.mean(np.abs(pred_test - ys_test) / np.abs(ys_test))
